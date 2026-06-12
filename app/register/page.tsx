@@ -18,7 +18,7 @@ e: React.FormEvent
 ) => {
 e.preventDefault();
 
-```
+
 if (password !== confirmPassword) {
   alert("Passwords do not match");
   return;
@@ -32,13 +32,13 @@ console.log({
 alert(
   "Registration will be connected later."
 );
-```
+
 
 };
 
 return ( <main className="min-h-screen flex items-center justify-center p-6"> <div className="card w-full max-w-md">
 
-```
+
     <div className="text-center mb-8">
 
       <img
@@ -129,7 +129,7 @@ return ( <main className="min-h-screen flex items-center justify-center p-6"> <d
 
   </div>
 </main>
-```
+
 
 );
 }

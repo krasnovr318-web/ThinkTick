@@ -25,7 +25,7 @@ useEffect(() => {
 const savedTheme =
 localStorage.getItem("theme");
 
-```
+
 const savedColor =
   localStorage.getItem("primaryColor");
 
@@ -45,14 +45,14 @@ if (savedColor) {
 
   setPrimaryColor(savedColor);
 }
-```
+
 
 }, []);
 
 const toggleTheme = () => {
 const html = document.documentElement;
 
-```
+
 if (darkMode) {
   html.classList.remove("dark");
 
@@ -70,14 +70,14 @@ if (darkMode) {
 }
 
 setDarkMode(!darkMode);
-```
+
 
 };
 
 const changeColor = (color: string) => {
 setPrimaryColor(color);
 
-```
+
 document.documentElement.style.setProperty(
   "--primary-color",
   color
@@ -87,13 +87,13 @@ localStorage.setItem(
   "primaryColor",
   color
 );
-```
+
 
 };
 
 return ( <main className="min-h-screen p-6"> <div className="max-w-4xl mx-auto">
 
-```
+
     <Link
       href="/"
       className="inline-block mb-8"
@@ -181,7 +181,7 @@ return ( <main className="min-h-screen p-6"> <div className="max-w-4xl mx-auto">
 
   </div>
 </main>
-```
+
 
 );
 }

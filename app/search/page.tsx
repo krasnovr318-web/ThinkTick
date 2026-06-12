@@ -50,7 +50,7 @@ quiz.title
 String(quiz.id).includes(search)
 );
 
-```
+
 if (sortBy === "popularity") {
   return filtered.sort(
     (a, b) => b.likes - a.likes
@@ -66,13 +66,13 @@ if (sortBy === "date") {
 }
 
 return filtered;
-```
+
 
 }, [search, sortBy]);
 
 return ( <main className="min-h-screen p-6"> <div className="max-w-5xl mx-auto">
 
-```
+
     <Link
       href="/"
       className="inline-block mb-8"
@@ -172,7 +172,7 @@ return ( <main className="min-h-screen p-6"> <div className="max-w-5xl mx-auto">
 
   </div>
 </main>
-```
+
 
 );
 }

@@ -34,7 +34,7 @@ const totalBad = myQuizzes.reduce(
 
 return ( <main className="min-h-screen p-6"> <div className="max-w-6xl mx-auto">
 
-```
+
     <Link
       href="/"
       className="inline-block mb-8"
@@ -202,7 +202,7 @@ return ( <main className="min-h-screen p-6"> <div className="max-w-6xl mx-auto">
 
   </div>
 </main>
-```
+
 
 );
 }

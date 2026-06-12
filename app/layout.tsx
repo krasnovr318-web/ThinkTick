@@ -14,7 +14,7 @@ children: React.ReactNode;
 return ( <html lang="en"> <body>
 {/* Декоративные элементы */}
 
-```
+
     <img
       src="/pic/Confetti.png"
       alt=""
@@ -30,7 +30,7 @@ return ( <html lang="en"> <body>
     {children}
   </body>
 </html>
-```
+
 
 );
 }

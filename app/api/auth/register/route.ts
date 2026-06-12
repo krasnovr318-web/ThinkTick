@@ -13,7 +13,7 @@ request: NextRequest
 try {
 const body = await request.json();
 
-```
+
 const {
   username,
   password
@@ -104,7 +104,7 @@ return NextResponse.json({
     username: data.username
   }
 });
-```
+
 
 } catch (error) {
 return NextResponse.json(

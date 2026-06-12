@@ -36,7 +36,7 @@ description: "Physics, chemistry and biology."
 export default function TemplatesPage() {
 return ( <main className="min-h-screen p-6"> <div className="max-w-6xl mx-auto">
 
-```
+
     <Link
       href="/create"
       className="inline-block mb-8 opacity-70 hover:opacity-100"
@@ -91,7 +91,7 @@ return ( <main className="min-h-screen p-6"> <div className="max-w-6xl mx-auto">
 
   </div>
 </main>
-```
+
 
 );
 }

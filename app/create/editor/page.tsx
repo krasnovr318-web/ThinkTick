@@ -52,7 +52,7 @@ answerIndex: number
 ) => {
 const copy = [...questions];
 
-```
+
 copy[questionIndex]
   .answers[answerIndex]
   .isCorrect =
@@ -61,28 +61,28 @@ copy[questionIndex]
     .isCorrect;
 
 setQuestions(copy);
-```
+
 
 };
 
 const addAnswer = (questionIndex: number) => {
 const copy = [...questions];
 
-```
+
 copy[questionIndex].answers.push({
   text: "",
   isCorrect: false
 });
 
 setQuestions(copy);
-```
+
 
 };
 
 const addQuestion = () => {
 if (questions.length >= 31) return;
 
-```
+
 setQuestions([
   ...questions,
   {
@@ -99,7 +99,7 @@ setQuestions([
     ]
   }
 ]);
-```
+
 
 };
 
@@ -108,13 +108,13 @@ questionIndex: number
 ) => {
 if (questions.length === 1) return;
 
-```
+
 const copy = questions.filter(
   (_, index) => index !== questionIndex
 );
 
 setQuestions(copy);
-```
+
 
 };
 
@@ -125,17 +125,17 @@ description,
 questions
 });
 
-```
+
 alert(
   "Quiz saved! Database connection will be added later."
 );
-```
+
 
 };
 
 return ( <main className="min-h-screen p-6"> <div className="max-w-5xl mx-auto">
 
-```
+
     <Link
       href="/create"
       className="inline-block mb-8"
@@ -296,7 +296,7 @@ return ( <main className="min-h-screen p-6"> <div className="max-w-5xl mx-auto">
 
   </div>
 </main>
-```
+
 
 );
 }

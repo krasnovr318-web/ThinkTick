@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function HomePage() {
 return ( <main className="min-h-screen flex items-center justify-center p-6"> <div className="w-full max-w-4xl">
 
-```
+
     {/* Верхняя панель */}
 
     <header className="flex justify-between items-center mb-10">
@@ -147,7 +147,7 @@ return ( <main className="min-h-screen flex items-center justify-center p-6"> <d
 
   </div>
 </main>
-```
+
 
 );
 }
