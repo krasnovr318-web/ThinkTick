@@ -108,7 +108,7 @@ return NextResponse.json({
   success: true,
   quiz: data
 });
-```
+
 
 } catch {
 return NextResponse.json(
