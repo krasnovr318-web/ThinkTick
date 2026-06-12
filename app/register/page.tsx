@@ -2,134 +2,186 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
-const [username, setUsername] =
-useState("");
+  const router = useRouter();
 
-const [password, setPassword] =
-useState("");
+  const [username, setUsername] =
+    useState("");
 
-const [confirmPassword, setConfirmPassword] =
-useState("");
+  const [password, setPassword] =
+    useState("");
 
-const handleRegister = (
-e: React.FormEvent
-) => {
-e.preventDefault();
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
 
+  const [loading, setLoading] =
+    useState(false);
 
-if (password !== confirmPassword) {
-  alert("Passwords do not match");
-  return;
-}
+  async function handleRegister(
+    e: React.FormEvent
+  ) {
+    e.preventDefault();
 
-console.log({
-  username,
-  password
-});
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
 
-alert(
-  "Registration will be connected later."
-);
+    if (password.length < 6) {
+      alert(
+        "Password must be at least 6 characters"
+      );
+      return;
+    }
 
+    try {
+      setLoading(true);
 
-};
+      const response =
+        await fetch(
+          "/api/auth/register",
+          {
+            method: "POST",
 
-return ( <main className="min-h-screen flex items-center justify-center p-6"> <div className="card w-full max-w-md">
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
 
+            body: JSON.stringify({
+              username,
+              password
+            })
+          }
+        );
 
-    <div className="text-center mb-8">
+      const data =
+        await response.json();
 
-      <img
-        src="/pic/create-test-profile.png"
-        alt="Profile"
-        width={80}
-        height={80}
-        className="mx-auto mb-4"
-      />
+      if (!data.success) {
+        alert(
+          data.message ||
+            "Registration failed"
+        );
 
-      <h1 className="text-4xl font-bold">
-        Create Account
-      </h1>
+        return;
+      }
 
-      <p className="opacity-70 mt-2">
-        Join ThinkTick
-      </p>
+      alert(
+        "Account created successfully"
+      );
 
-    </div>
+      router.push("/login");
 
-    <form
-      onSubmit={handleRegister}
-      className="space-y-4"
-    >
+    } catch (error) {
+      console.error(error);
 
-      <input
-        type="text"
-        placeholder="Username"
-        className="w-full p-3 border rounded"
-        value={username}
-        onChange={(e) =>
-          setUsername(
-            e.target.value
-          )
-        }
-        required
-      />
+      alert(
+        "Server error. Try again later."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
 
-      <input
-        type="password"
-        placeholder="Password"
-        className="w-full p-3 border rounded"
-        value={password}
-        onChange={(e) =>
-          setPassword(
-            e.target.value
-          )
-        }
-        required
-      />
+  return (
+    <main className="min-h-screen flex items-center justify-center p-6">
+      <div className="card w-full max-w-md">
 
-      <input
-        type="password"
-        placeholder="Confirm Password"
-        className="w-full p-3 border rounded"
-        value={confirmPassword}
-        onChange={(e) =>
-          setConfirmPassword(
-            e.target.value
-          )
-        }
-        required
-      />
+        <div className="text-center mb-8">
 
-      <button
-        type="submit"
-        className="primary-btn w-full"
-      >
-        Register
-      </button>
+          <img
+            src="/pic/create-test-profile.png"
+            alt="Profile"
+            width={80}
+            height={80}
+            className="mx-auto mb-4"
+          />
 
-    </form>
+          <h1 className="text-4xl font-bold">
+            Create Account
+          </h1>
 
-    <div className="text-center mt-6">
+          <p className="opacity-70 mt-2">
+            Join ThinkTick
+          </p>
 
-      <p className="opacity-70">
-        Already have an account?
-      </p>
+        </div>
 
-      <Link
-        href="/login"
-        className="font-semibold"
-      >
-        Login
-      </Link>
+        <form
+          onSubmit={handleRegister}
+          className="space-y-4"
+        >
 
-    </div>
+          <input
+            type="text"
+            placeholder="Username"
+            className="w-full p-3 border rounded"
+            value={username}
+            onChange={(e) =>
+              setUsername(
+                e.target.value
+              )
+            }
+            required
+          />
 
-  </div>
-</main>
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full p-3 border rounded"
+            value={password}
+            onChange={(e) =>
+              setPassword(
+                e.target.value
+              )
+            }
+            required
+          />
 
+          <input
+            type="password"
+            placeholder="Confirm Password"
+            className="w-full p-3 border rounded"
+            value={confirmPassword}
+            onChange={(e) =>
+              setConfirmPassword(
+                e.target.value
+              )
+            }
+            required
+          />
 
-);
+          <button
+            type="submit"
+            disabled={loading}
+            className="primary-btn w-full"
+          >
+            {loading
+              ? "Creating..."
+              : "Register"}
+          </button>
+
+        </form>
+
+        <div className="text-center mt-6">
+
+          <p className="opacity-70">
+            Already have an account?
+          </p>
+
+          <Link
+            href="/login"
+            className="font-semibold"
+          >
+            Login
+          </Link>
+
+        </div>
+
+      </div>
+    </main>
+  );
 }
