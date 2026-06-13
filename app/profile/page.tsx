@@ -1,208 +1,249 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
-const myQuizzes = [
-{
-id: 1001,
-title: "World History",
-good: 120,
-normal: 15,
-upset: 3,
-angry: 1
-},
-{
-id: 1002,
-title: "Basic Mathematics",
-good: 250,
-normal: 20,
-upset: 2,
-angry: 0
+import AuthGuard from "@/components/AuthGuard";
+import QuizCard from "@/components/QuizCard";
+
+interface User {
+  id: string;
+  username: string;
 }
-];
+
+interface Quiz {
+  id: string;
+  title: string;
+  description: string;
+  created_at: string;
+}
 
 export default function ProfilePage() {
-const totalGood = myQuizzes.reduce(
-(sum, quiz) => sum + quiz.good,
-0
-);
+  const [user, setUser] =
+    useState<User | null>(null);
 
-const totalBad = myQuizzes.reduce(
-(sum, quiz) => sum + quiz.upset + quiz.angry,
-0
-);
+  const [quizzes, setQuizzes] =
+    useState<Quiz[]>([]);
 
-return ( <main className="min-h-screen p-6"> <div className="max-w-6xl mx-auto">
+  const [loading, setLoading] =
+    useState(true);
 
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
-    <Link
-      href="/"
-      className="inline-block mb-8"
-    >
-      ← Back
-    </Link>
+  const loadProfile =
+    async () => {
+      try {
+        const savedUser =
+          localStorage.getItem(
+            "user"
+          );
 
-    <div className="flex items-center gap-4 mb-10">
+        if (!savedUser) {
+          return;
+        }
 
-      <img
-        src="/pic/create-test-profile.png"
-        alt="Profile"
-        width={80}
-        height={80}
-      />
+        const currentUser =
+          JSON.parse(
+            savedUser
+          );
 
-      <div>
-        <h1 className="text-4xl font-bold">
-          Profile
-        </h1>
+        setUser(
+          currentUser
+        );
 
-        <p className="opacity-70">
-          Username: DemoUser
-        </p>
-      </div>
+        const response =
+          await fetch(
+            "/api/quizzes"
+          );
 
-    </div>
+        const data =
+          await response.json();
 
-    <div className="grid md:grid-cols-2 gap-6 mb-10">
+        if (
+          data.success
+        ) {
+          const ownQuizzes =
+            data.quizzes.filter(
+              (
+                quiz: any
+              ) =>
+                quiz.author_id ===
+                currentUser.id
+            );
 
-      <div className="card">
-        <h2 className="text-2xl font-semibold mb-4">
-          Statistics
-        </h2>
+          setQuizzes(
+            ownQuizzes
+          );
+        }
+      } catch (
+        error
+      ) {
+        console.error(
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
-        <p>
-          Quizzes Created:
-          {" "}
-          {myQuizzes.length}
-        </p>
+  if (loading) {
+    return (
+      <AuthGuard>
+        <main className="min-h-screen flex items-center justify-center">
+          <h1 className="text-3xl font-bold">
+            Loading...
+          </h1>
+        </main>
+      </AuthGuard>
+    );
+  }
 
-        <p>
-          Good Reactions:
-          {" "}
-          {totalGood}
-        </p>
+  return (
+    <AuthGuard>
+      <main className="min-h-screen px-6 py-12">
 
-        <p>
-          Bad Reactions:
-          {" "}
-          {totalBad}
-        </p>
-      </div>
+        <div className="max-w-6xl mx-auto">
 
-      <div className="card">
-        <h2 className="text-2xl font-semibold mb-4">
-          Reactions
-        </h2>
+          {/* Profile Card */}
+          <div className="card p-8 mb-10">
 
-        <div className="flex items-center gap-3 mb-2">
-          <img
-            src="/pic/good reaction.png"
-            alt="Good"
-            width={30}
-            height={30}
-          />
-          <span>{totalGood}</span>
-        </div>
+            <div className="flex flex-col md:flex-row items-center gap-8">
 
-        <div className="flex items-center gap-3 mb-2">
-          <img
-            src="/pic/upset reaction.png"
-            alt="Upset"
-            width={30}
-            height={30}
-          />
-          <span>
-            {
-              myQuizzes.reduce(
-                (sum, quiz) =>
-                  sum + quiz.upset,
-                0
-              )
-            }
-          </span>
-        </div>
+              <img
+                src="/pic/create-test-profile.png"
+                alt="Profile"
+                width={120}
+                height={120}
+              />
 
-        <div className="flex items-center gap-3">
-          <img
-            src="/pic/angry reaction.png"
-            alt="Angry"
-            width={30}
-            height={30}
-          />
-          <span>
-            {
-              myQuizzes.reduce(
-                (sum, quiz) =>
-                  sum + quiz.angry,
-                0
-              )
-            }
-          </span>
-        </div>
+              <div>
 
-      </div>
+                <h1 className="text-5xl font-bold mb-3">
+                  {user?.username}
+                </h1>
 
-    </div>
+                <p className="opacity-70 text-lg">
+                  Welcome to
+                  ThinkTick
+                </p>
 
-    <h2 className="text-3xl font-bold mb-6">
-      My Quizzes
-    </h2>
-
-    <div className="grid gap-4">
-
-      {myQuizzes.map((quiz) => (
-        <div
-          key={quiz.id}
-          className="card"
-        >
-          <div className="flex justify-between items-center">
-
-            <div>
-              <h3 className="text-xl font-semibold">
-                {quiz.title}
-              </h3>
-
-              <p className="opacity-70">
-                ID: {quiz.id}
-              </p>
-            </div>
-
-            <div className="flex gap-3">
-
-              <Link
-                href={`/create/editor?id=${quiz.id}`}
-                className="hover:scale-105 transition"
-              >
-                <img
-                  src="/pic/pencil.png"
-                  alt="Edit"
-                  width={36}
-                  height={36}
-                />
-              </Link>
-
-              <button
-                className="hover:scale-105 transition"
-              >
-                <img
-                  src="/pic/trashcan.png"
-                  alt="Delete"
-                  width={36}
-                  height={36}
-                />
-              </button>
+              </div>
 
             </div>
 
           </div>
+
+          {/* Statistics */}
+          <div className="grid md:grid-cols-3 gap-6 mb-10">
+
+            <div className="card p-8 text-center">
+
+              <h2 className="text-5xl font-bold mb-4">
+                {
+                  quizzes.length
+                }
+              </h2>
+
+              <p className="opacity-70">
+                Created
+                Quizzes
+              </p>
+
+            </div>
+
+            <div className="card p-8 text-center">
+
+              <h2 className="text-5xl font-bold mb-4">
+                0
+              </h2>
+
+              <p className="opacity-70">
+                Completed
+                Quizzes
+              </p>
+
+            </div>
+
+            <div className="card p-8 text-center">
+
+              <h2 className="text-5xl font-bold mb-4">
+                0%
+              </h2>
+
+              <p className="opacity-70">
+                Average
+                Score
+              </p>
+
+            </div>
+
+          </div>
+
+          {/* My Quizzes */}
+          <div>
+
+            <h2 className="text-4xl font-bold mb-8">
+              My Quizzes
+            </h2>
+
+            {quizzes.length ===
+            0 ? (
+              <div className="card p-10 text-center">
+
+                <h3 className="text-2xl font-bold mb-4">
+                  No quizzes yet
+                </h3>
+
+                <p className="opacity-70 mb-6">
+                  Create your
+                  first quiz.
+                </p>
+
+                <Link
+                  href="/create"
+                  className="primary-btn inline-block"
+                >
+                  Create Quiz
+                </Link>
+
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
+
+                {quizzes.map(
+                  (
+                    quiz
+                  ) => (
+                    <QuizCard
+                      key={
+                        quiz.id
+                      }
+                      id={
+                        quiz.id
+                      }
+                      title={
+                        quiz.title
+                      }
+                      description={
+                        quiz.description
+                      }
+                      createdAt={
+                        quiz.created_at
+                      }
+                    />
+                  )
+                )}
+
+              </div>
+            )}
+
+          </div>
+
         </div>
-      ))}
 
-    </div>
-
-  </div>
-</main>
-
-
-);
+      </main>
+    </AuthGuard>
+  );
 }

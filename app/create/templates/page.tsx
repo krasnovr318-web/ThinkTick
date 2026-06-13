@@ -1,98 +1,113 @@
 import Link from "next/link";
 
 const templates = [
-{
-id: 1,
-title: "World History",
-description: "A quiz about important events in world history."
-},
-{
-id: 2,
-title: "Basic Mathematics",
-description: "Arithmetic, algebra and logical thinking."
-},
-{
-id: 3,
-title: "English Language",
-description: "Grammar, vocabulary and reading skills."
-},
-{
-id: 4,
-title: "Geography of Europe",
-description: "Countries, capitals and landmarks."
-},
-{
-id: 5,
-title: "Video Games",
-description: "Popular games and gaming culture."
-},
-{
-id: 6,
-title: "Science",
-description: "Physics, chemistry and biology."
-}
+  {
+    id: 1,
+    title: "Math Quiz",
+    description:
+      "Basic mathematics questions for students.",
+    image:
+      "/pic/create-test-profile.png"
+  },
+  {
+    id: 2,
+    title: "History Quiz",
+    description:
+      "Questions about historical events and famous people.",
+    image:
+      "/pic/create-test-search.png"
+  },
+  {
+    id: 3,
+    title: "Geography Quiz",
+    description:
+      "Countries, capitals and world landmarks.",
+    image:
+      "/pic/create-test-settings.png"
+  },
+  {
+    id: 4,
+    title: "English Vocabulary",
+    description:
+      "Practice words, grammar and translations.",
+    image:
+      "/pic/create-test-profile.png"
+  },
+  {
+    id: 5,
+    title: "Fun Quiz",
+    description:
+      "Funny questions for friends and communities.",
+    image:
+      "/pic/create-test-search.png"
+  }
 ];
 
 export default function TemplatesPage() {
-return ( <main className="min-h-screen p-6"> <div className="max-w-6xl mx-auto">
+  return (
+    <main className="min-h-[calc(100vh-80px)] px-6 py-12">
+      <div className="max-w-7xl mx-auto">
 
+        {/* Header */}
+        <div className="text-center mb-14">
 
-    <Link
-      href="/create"
-      className="inline-block mb-8 opacity-70 hover:opacity-100"
-    >
-      ← Back
-    </Link>
+          <img
+            src="/pic/create-test.png"
+            alt="Templates"
+            width={110}
+            height={110}
+            className="mx-auto mb-6"
+          />
 
-    <h1 className="text-4xl font-bold mb-2">
-      Quiz Templates
-    </h1>
+          <h1 className="text-5xl font-bold mb-4">
+            Quiz Templates
+          </h1>
 
-    <p className="opacity-70 mb-10">
-      Choose a template and customize it.
-    </p>
+          <p className="text-lg opacity-70 max-w-2xl mx-auto">
+            Start with a ready-made template
+            and customize it however you want.
+          </p>
 
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-      {templates.map((template) => (
-        <div
-          key={template.id}
-          className="card"
-        >
-          <div className="flex flex-col gap-4">
-
-            <img
-              src="/pic/brush.png"
-              alt="Template"
-              width={60}
-              height={60}
-            />
-
-            <h2 className="text-2xl font-semibold">
-              {template.title}
-            </h2>
-
-            <p className="opacity-80">
-              {template.description}
-            </p>
-
-            <Link
-              href={`/create/editor?template=${template.id}`}
-              className="primary-btn text-center"
-            >
-              Use Template
-            </Link>
-
-          </div>
         </div>
-      ))}
 
-    </div>
+        {/* Templates */}
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
 
-  </div>
-</main>
+          {templates.map((template) => (
+            <div
+              key={template.id}
+              className="card p-8 flex flex-col"
+            >
 
+              <img
+                src={template.image}
+                alt={template.title}
+                width={100}
+                height={100}
+                className="mx-auto mb-6"
+              />
 
-);
+              <h2 className="text-2xl font-bold mb-4 text-center">
+                {template.title}
+              </h2>
+
+              <p className="opacity-70 text-center flex-1">
+                {template.description}
+              </p>
+
+              <Link
+                href={`/create/editor?template=${template.id}`}
+                className="primary-btn mt-8 text-center"
+              >
+                Use Template
+              </Link>
+
+            </div>
+          ))}
+
+        </div>
+
+      </div>
+    </main>
+  );
 }
-

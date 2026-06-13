@@ -1,36 +1,30 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+import Navbar from "@/components/Navbar";
+
 export const metadata: Metadata = {
-title: "ThinkTick",
-description: "Create and share quizzes with ThinkTick",
+  title: "ThinkTick",
+  description:
+    "Create quizzes and tests for education and fun."
 };
 
 export default function RootLayout({
-children,
-}: {
-children: React.ReactNode;
-}) {
-return ( <html lang="en"> <body>
-{/* Декоративные элементы */}
+  children
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en">
+      <body className="min-h-screen">
 
+        <Navbar />
 
-    <img
-      src="/pic/Confetti.png"
-      alt=""
-      className="bg-confetti"
-    />
+        <main>
+          {children}
+        </main>
 
-    <img
-      src="/pic/pencil.png"
-      alt=""
-      className="bg-pencil"
-    />
-
-    {children}
-  </body>
-</html>
-
-
-);
+      </body>
+    </html>
+  );
 }

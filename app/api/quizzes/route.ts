@@ -4,18 +4,28 @@ import { supabase } from "@/lib/supabase";
 
 export async function GET() {
   try {
-    const { data, error } = await supabase
-      .from("quizzes")
-      .select("*")
-      .order("created_at", {
-        ascending: false
-      });
+    const { data, error } =
+      await supabase
+        .from("quizzes")
+        .select(`
+          *,
+          users (
+            username
+          )
+        `)
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
     if (error) {
       return NextResponse.json(
         {
           success: false,
-          message: error.message
+          message:
+            error.message
         },
         {
           status: 500
@@ -27,11 +37,13 @@ export async function GET() {
       success: true,
       quizzes: data
     });
+
   } catch {
     return NextResponse.json(
       {
         success: false,
-        message: "Internal server error"
+        message:
+          "Internal server error"
       },
       {
         status: 500
@@ -44,26 +56,22 @@ export async function POST(
   request: NextRequest
 ) {
   try {
-    const body = await request.json();
+    const body =
+      await request.json();
 
     const {
       title,
       description,
-      authorId,
+      author_id,
       questions
     } = body;
 
-    if (
-      !title ||
-      !authorId ||
-      !questions ||
-      questions.length === 0
-    ) {
+    if (!title) {
       return NextResponse.json(
         {
           success: false,
           message:
-            "Missing required fields"
+            "Quiz title is required"
         },
         {
           status: 400
@@ -71,23 +79,44 @@ export async function POST(
       );
     }
 
-    const { data: quiz, error: quizError } =
-      await supabase
-        .from("quizzes")
-        .insert({
-          title,
-          description,
-          author_id: authorId
-        })
-        .select()
-        .single();
-
-    if (quizError) {
+    if (
+      !questions ||
+      questions.length === 0
+    ) {
       return NextResponse.json(
         {
           success: false,
           message:
-            quizError.message
+            "Quiz must contain questions"
+        },
+        {
+          status: 400
+        }
+      );
+    }
+
+    const {
+      data: quiz,
+      error: quizError
+    } = await supabase
+      .from("quizzes")
+      .insert({
+        title,
+        description,
+        author_id
+      })
+      .select()
+      .single();
+
+    if (
+      quizError ||
+      !quiz
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            quizError?.message
         },
         {
           status: 500
@@ -96,58 +125,83 @@ export async function POST(
     }
 
     for (
-      let questionIndex = 0;
-      questionIndex < questions.length;
-      questionIndex++
+      let i = 0;
+      i < questions.length;
+      i++
     ) {
       const question =
-        questions[questionIndex];
+        questions[i];
 
       const {
-        data: questionData,
-        error: questionError
-      } = await supabase
-        .from("questions")
-        .insert({
-          quiz_id: quiz.id,
-          question_text:
-            question.question,
-          position:
-            questionIndex + 1
-        })
-        .select()
-        .single();
+        data:
+          createdQuestion,
+        error:
+          questionError
+      } =
+        await supabase
+          .from(
+            "questions"
+          )
+          .insert({
+            quiz_id:
+              quiz.id,
+            question_text:
+              question.question_text,
+            question_order:
+              i + 1
+          })
+          .select()
+          .single();
 
       if (
         questionError ||
-        !questionData
+        !createdQuestion
       ) {
         continue;
       }
 
-      for (const answer of question.answers) {
+      for (
+        let j = 0;
+        j <
+        question.answers
+          .length;
+        j++
+      ) {
+        const answer =
+          question.answers[
+            j
+          ];
+
         await supabase
-          .from("answers")
+          .from(
+            "answers"
+          )
           .insert({
             question_id:
-              questionData.id,
+              createdQuestion.id,
             answer_text:
-              answer.text,
+              answer.answer_text,
             is_correct:
-              answer.isCorrect
+              answer.is_correct,
+            answer_order:
+              j + 1
           });
       }
     }
 
     return NextResponse.json({
       success: true,
+      message:
+        "Quiz created successfully",
       quizId: quiz.id
     });
+
   } catch {
     return NextResponse.json(
       {
         success: false,
-        message: "Internal server error"
+        message:
+          "Internal server error"
       },
       {
         status: 500

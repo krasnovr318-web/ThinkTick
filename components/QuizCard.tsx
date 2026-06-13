@@ -1,178 +1,85 @@
+"use client";
+
 import Link from "next/link";
 
-type Props = {
+interface QuizCardProps {
   id: string;
-
   title: string;
-
-  description: string;
-
-  createdAt: string;
-
-  reactions?: {
-    good: number;
-    normal: number;
-    upset: number;
-    angry: number;
-  };
-
-  editable?: boolean;
-
-  onDelete?: (
-    quizId: string
-  ) => void;
-};
+  description?: string;
+  author?: string;
+  createdAt?: string;
+  likes?: number;
+  dislikes?: number;
+}
 
 export default function QuizCard({
   id,
   title,
   description,
+  author,
   createdAt,
-
-  reactions,
-
-  editable = false,
-
-  onDelete
-}: Props) {
-  const totalReactions =
-    (reactions?.good || 0) +
-    (reactions?.normal || 0) +
-    (reactions?.upset || 0) +
-    (reactions?.angry || 0);
-
+  likes = 0,
+  dislikes = 0
+}: QuizCardProps) {
   return (
-    <div className="card">
+    <div className="card p-6 flex flex-col h-full">
 
-      <div className="flex justify-between items-start">
+      <h2 className="text-2xl font-bold mb-3">
+        {title}
+      </h2>
 
-        <div className="flex-1">
+      <p className="opacity-70 mb-6 flex-1">
+        {description ||
+          "No description provided."}
+      </p>
 
-          <Link href={`/quiz/${id}`}>
-            <h2 className="text-2xl font-semibold hover:underline">
-              {title}
-            </h2>
-          </Link>
+      <div className="space-y-2 mb-6 text-sm opacity-70">
 
-          <p className="mt-2 opacity-80">
-            {description}
-          </p>
+        <div>
+          <strong>ID:</strong>{" "}
+          {id}
+        </div>
 
-          <div className="mt-4 text-sm opacity-70">
-            Created:
-            {" "}
+        {author && (
+          <div>
+            <strong>Author:</strong>{" "}
+            {author}
+          </div>
+        )}
+
+        {createdAt && (
+          <div>
+            <strong>Created:</strong>{" "}
             {new Date(
               createdAt
             ).toLocaleDateString()}
-          </div>
-
-        </div>
-
-        {editable && (
-          <div className="flex gap-3 ml-4">
-
-            <Link
-              href={`/create/editor?id=${id}`}
-              className="hover:scale-105 transition"
-            >
-              <img
-                src="/pic/pencil.png"
-                alt="Edit"
-                width={32}
-                height={32}
-              />
-            </Link>
-
-            <button
-              onClick={() =>
-                onDelete?.(id)
-              }
-              className="hover:scale-105 transition"
-            >
-              <img
-                src="/pic/trashcan.png"
-                alt="Delete"
-                width={32}
-                height={32}
-              />
-            </button>
-
           </div>
         )}
 
       </div>
 
-      {reactions && (
-        <div className="flex flex-wrap gap-4 mt-6">
+      <div className="flex items-center justify-between mb-6">
 
-          <div className="flex items-center gap-2">
+        <div className="flex gap-4">
 
-            <img
-              src="/pic/good reaction.png"
-              alt="Good"
-              width={24}
-              height={24}
-            />
+          <span>
+            👍 {likes}
+          </span>
 
-            <span>
-              {reactions.good}
-            </span>
-
-          </div>
-
-          <div className="flex items-center gap-2">
-
-            <img
-              src="/pic/normal reaction.png"
-              alt="Normal"
-              width={24}
-              height={24}
-            />
-
-            <span>
-              {reactions.normal}
-            </span>
-
-          </div>
-
-          <div className="flex items-center gap-2">
-
-            <img
-              src="/pic/upset reaction.png"
-              alt="Upset"
-              width={24}
-              height={24}
-            />
-
-            <span>
-              {reactions.upset}
-            </span>
-
-          </div>
-
-          <div className="flex items-center gap-2">
-
-            <img
-              src="/pic/angry reaction.png"
-              alt="Angry"
-              width={24}
-              height={24}
-            />
-
-            <span>
-              {reactions.angry}
-            </span>
-
-          </div>
-
-          <div className="ml-auto font-semibold">
-            Total:
-            {" "}
-            {totalReactions}
-          </div>
+          <span>
+            👎 {dislikes}
+          </span>
 
         </div>
-      )}
+
+      </div>
+
+      <Link
+        href={`/quiz/${id}`}
+        className="primary-btn text-center"
+      >
+        Open Quiz
+      </Link>
 
     </div>
   );

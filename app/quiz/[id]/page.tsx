@@ -1,263 +1,320 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 
-import ReactionBar from "@/components/ReactionBar";
-
-type Answer = {
+interface Answer {
   id: string;
   answer_text: string;
-};
+  is_correct: boolean;
+}
 
-type Question = {
+interface Question {
   id: string;
   question_text: string;
   answers: Answer[];
-};
+}
 
-type Quiz = {
+interface Quiz {
   id: string;
   title: string;
   description: string;
   questions: Question[];
-};
+}
 
-export default function QuizPage() {
-  const params = useParams();
-
+export default function QuizPage({
+  params
+}: {
+  params: Promise<{
+    id: string;
+  }>;
+}) {
   const [quiz, setQuiz] =
     useState<Quiz | null>(null);
 
   const [loading, setLoading] =
     useState(true);
 
-  const [currentQuestion, setCurrentQuestion] =
-    useState(0);
-
   const [selectedAnswers, setSelectedAnswers] =
-    useState<Record<string, string[]>>(
-      {}
-    );
+    useState<
+      Record<string, string[]>
+    >({});
 
-  const [finished, setFinished] =
-    useState(false);
+  const [score, setScore] =
+    useState<number | null>(
+      null
+    );
 
   useEffect(() => {
     loadQuiz();
   }, []);
 
-  async function loadQuiz() {
-    try {
-      const response =
-        await fetch(
-          `/api/quizzes/${params.id}`
+  const loadQuiz =
+    async () => {
+      try {
+        const { id } =
+          await params;
+
+        const response =
+          await fetch(
+            `/api/quizzes/${id}`
+          );
+
+        const data =
+          await response.json();
+
+        if (
+          data.success
+        ) {
+          setQuiz(
+            data.quiz
+          );
+        }
+      } catch (
+        error
+      ) {
+        console.error(
+          error
         );
-
-      const data =
-        await response.json();
-
-      if (data.success) {
-        setQuiz(data.quiz);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
+    };
 
-  function toggleAnswer(
+  const toggleAnswer = (
     questionId: string,
     answerId: string
-  ) {
-    setSelectedAnswers((prev) => {
-      const current =
-        prev[questionId] || [];
+  ) => {
+    setSelectedAnswers(
+      (previous) => {
+        const current =
+          previous[
+            questionId
+          ] || [];
 
-      const exists =
-        current.includes(answerId);
+        const exists =
+          current.includes(
+            answerId
+          );
 
-      return {
-        ...prev,
+        return {
+          ...previous,
+          [questionId]:
+            exists
+              ? current.filter(
+                  (
+                    id
+                  ) =>
+                    id !==
+                    answerId
+                )
+              : [
+                  ...current,
+                  answerId
+                ]
+        };
+      }
+    );
+  };
 
-        [questionId]: exists
-          ? current.filter(
-              (id) => id !== answerId
-            )
-          : [...current, answerId]
-      };
-    });
-  }
+  const finishQuiz = () => {
+    if (!quiz) {
+      return;
+    }
 
-  function nextQuestion() {
-    if (!quiz) return;
+    let correct = 0;
 
-    if (
-      currentQuestion <
-      quiz.questions.length - 1
+    for (
+      const question of quiz.questions
     ) {
-      setCurrentQuestion(
-        currentQuestion + 1
-      );
-    } else {
-      setFinished(true);
-    }
-  }
+      const selected =
+        selectedAnswers[
+          question.id
+        ] || [];
 
-  function previousQuestion() {
-    if (currentQuestion > 0) {
-      setCurrentQuestion(
-        currentQuestion - 1
-      );
+      const rightAnswers =
+        question.answers
+          .filter(
+            (
+              answer
+            ) =>
+              answer.is_correct
+          )
+          .map(
+            (
+              answer
+            ) =>
+              answer.id
+          );
+
+      const isCorrect =
+        selected.length ===
+          rightAnswers.length &&
+        selected.every(
+          (
+            answerId
+          ) =>
+            rightAnswers.includes(
+              answerId
+            )
+        );
+
+      if (isCorrect) {
+        correct++;
+      }
     }
-  }
+
+    const result =
+      Math.round(
+        (correct /
+          quiz.questions
+            .length) *
+          100
+      );
+
+    setScore(result);
+  };
 
   if (loading) {
     return (
-      <main className="p-6">
-        Loading...
+      <main className="min-h-screen flex items-center justify-center">
+        <h1 className="text-3xl font-bold">
+          Loading...
+        </h1>
       </main>
     );
   }
 
   if (!quiz) {
     return (
-      <main className="p-6">
-        Quiz not found.
+      <main className="min-h-screen flex items-center justify-center">
+        <h1 className="text-3xl font-bold">
+          Quiz not found
+        </h1>
       </main>
     );
   }
-
-  if (finished) {
-    return (
-      <main className="min-h-screen p-6">
-        <div className="max-w-4xl mx-auto">
-
-          <div className="card text-center">
-
-            <h1 className="text-4xl font-bold mb-4">
-              Quiz Completed!
-            </h1>
-
-            <p className="mb-6">
-              Thanks for completing
-              the quiz.
-            </p>
-
-            <ReactionBar
-              quizId={quiz.id}
-              userId="demo-user"
-            />
-
-          </div>
-
-        </div>
-      </main>
-    );
-  }
-
-  const question =
-    quiz.questions[currentQuestion];
 
   return (
-    <main className="min-h-screen p-6">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen px-6 py-12">
+      <div className="max-w-5xl mx-auto">
 
-        <div className="card mb-6">
+        <div className="card p-8 mb-10">
 
-          <h1 className="text-4xl font-bold">
+          <h1 className="text-5xl font-bold mb-4">
             {quiz.title}
           </h1>
 
-          <p className="opacity-80 mt-2">
+          <p className="opacity-70">
             {quiz.description}
           </p>
 
         </div>
 
-        <div className="card">
+        {quiz.questions.map(
+          (
+            question,
+            questionIndex
+          ) => (
+            <div
+              key={
+                question.id
+              }
+              className="card p-8 mb-8"
+            >
 
-          <div className="mb-4">
+              <h2 className="text-2xl font-bold mb-6">
+                Question{" "}
+                {questionIndex +
+                  1}
+              </h2>
 
-            Question
-            {" "}
-            {currentQuestion + 1}
-            {" "}
-            /
-            {" "}
-            {quiz.questions.length}
+              <p className="text-lg mb-8">
+                {
+                  question.question_text
+                }
+              </p>
 
-          </div>
+              <div className="space-y-4">
 
-          <h2 className="text-2xl font-semibold mb-6">
-            {question.question_text}
-          </h2>
-
-          <div className="space-y-3">
-
-            {question.answers.map(
-              (answer) => (
-                <label
-                  key={answer.id}
-                  className="flex gap-3 items-center p-3 border rounded cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={
-                      selectedAnswers[
-                        question.id
-                      ]?.includes(
+                {question.answers.map(
+                  (
+                    answer
+                  ) => (
+                    <label
+                      key={
                         answer.id
-                      ) || false
-                    }
-                    onChange={() =>
-                      toggleAnswer(
-                        question.id,
-                        answer.id
-                      )
-                    }
-                  />
+                      }
+                      className="flex gap-4 items-center border rounded p-4 cursor-pointer"
+                    >
 
-                  <span>
-                    {
-                      answer.answer_text
-                    }
-                  </span>
+                      <input
+                        type="checkbox"
+                        checked={
+                          (
+                            selectedAnswers[
+                              question
+                                .id
+                            ] ||
+                            []
+                          ).includes(
+                            answer.id
+                          )
+                        }
+                        onChange={() =>
+                          toggleAnswer(
+                            question.id,
+                            answer.id
+                          )
+                        }
+                      />
 
-                </label>
-              )
-            )}
+                      <span>
+                        {
+                          answer.answer_text
+                        }
+                      </span>
 
-          </div>
+                    </label>
+                  )
+                )}
 
-          <div className="flex justify-between mt-8">
+              </div>
+
+            </div>
+          )
+        )}
+
+        {score === null ? (
+          <div className="text-center">
 
             <button
               onClick={
-                previousQuestion
-              }
-              disabled={
-                currentQuestion === 0
+                finishQuiz
               }
               className="primary-btn"
             >
-              Previous
-            </button>
-
-            <button
-              onClick={nextQuestion}
-              className="primary-btn"
-            >
-              {currentQuestion ===
-              quiz.questions.length - 1
-                ? "Finish"
-                : "Next"}
+              Finish Quiz
             </button>
 
           </div>
+        ) : (
+          <div className="card p-10 text-center">
 
-        </div>
+            <h2 className="text-4xl font-bold mb-6">
+              Result
+            </h2>
+
+            <p className="text-6xl font-bold mb-4">
+              {score}%
+            </p>
+
+            <p className="opacity-70">
+              You completed
+              the quiz.
+            </p>
+
+          </div>
+        )}
 
       </div>
     </main>
